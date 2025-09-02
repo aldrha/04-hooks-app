@@ -4,12 +4,19 @@ const colors = {
     red: 'bg-red-500 animate-pulse',
     yellow: 'bg-yellow-500 animate-pulse',
     green: 'bg-green-500 animate-pulse',
+    // blue: 'bg-blue-500 animate-pulse',
+    // pink: 'bg-pink-500 animate-pulse',
 };
-export const TrafficLight = () => {
-    const [light, setLight] = useState('red');
 
-    const handleChangeLight = (color: string) => {
+type TrafficLightColor = 'red' | 'yellow' | 'green';
+// type TrafficLightColor = keyof typeof colors; // Esta forma de tipar se utiliza si se necesita que el tipo contenga las mismas key del objeto
+
+export const TrafficLight = () => {
+    const [light, setLight] = useState<TrafficLightColor>('red');
+
+    const handleChangeLight = (color: TrafficLightColor) => {
         setLight((prev) => {
+            //se tiene acceso al valor actual y al valor anterior
             console.log({ prev });
             return color;
         });
