@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useState } from 'react';
+import { useState } from 'react';
 
 import { Check, Plus, Trash2 } from 'lucide-react';
 
@@ -6,29 +6,45 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
-import { getTaskInicialValue, TaskReducer } from './reducer/taskReducer';
+
+interface Todo {
+    id: number;
+    text: string;
+    completed: boolean;
+}
 
 export const TasksApp = () => {
+    const [todos, setTodos] = useState<Todo[]>([]);
     const [inputValue, setInputValue] = useState('');
-    const [state, dispatch] = useReducer(TaskReducer, getTaskInicialValue());
-
-    useEffect(() => {
-        localStorage.setItem('tasks-state', JSON.stringify(state));
-    }, [state]);
 
     const addTodo = () => {
         if (inputValue.length === 0) return;
 
-        dispatch({ type: 'ADD_TODO', payload: inputValue });
+        const newTodo: Todo = {
+            id: Date.now(),
+            text: inputValue.trim(),
+            completed: false,
+        };
+
+        setTodos([...todos, newTodo]);
+        // setTodos((prev) => [...prev, newTodo])
         setInputValue('');
     };
 
     const toggleTodo = (id: number) => {
-        dispatch({ type: 'TOGGLE_TODO', payload: id });
+        const updateTodos = todos.map((todo) => {
+            if (todo.id === id) {
+                return { ...todo, completed: !todo.completed };
+            }
+            return todo;
+        });
+
+        setTodos(updateTodos);
     };
 
     const deleteTodo = (id: number) => {
-        dispatch({ type: 'DELETE_TODO', payload: id });
+        const updateTodos = todos.filter((todo) => todo.id !== id);
+        setTodos(updateTodos);
     };
 
     const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -37,7 +53,8 @@ export const TasksApp = () => {
         }
     };
 
-    const { todos, completed: completedCount, length: totalCount } = state;
+    const completedCount = todos.filter((todo) => todo.completed).length;
+    const totalCount = todos.length;
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4">
