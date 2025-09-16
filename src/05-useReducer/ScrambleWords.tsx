@@ -5,8 +5,9 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import confetii from 'canvas-confetti';
 import { Play, SkipForward } from 'lucide-react';
-import React, { useReducer } from 'react';
+import React, { useEffect, useReducer } from 'react';
 import { getInitialState, scrambleWordsReducer } from './reducer/scrambleWordsReducer';
 
 export const ScrambleWords = () => {
@@ -26,74 +27,44 @@ export const ScrambleWords = () => {
         totalWords,
     } = state;
 
-    // const [words, setWords] = useState(shuffleArray(GAME_WORDS));
+    useEffect(() => {
+        if (points === 0) return;
 
-    // const [currentWord, setCurrentWord] = useState(words[0]);
-    // const [scrambledWord, setScrambledWord] = useState(scrambleWord(currentWord));
-    // const [guess, setGuess] = useState('');
-    // const [points, setPoints] = useState(0);
-    // const [errorCounter, setErrorCounter] = useState(0);
-    // const [maxAllowErrors, setMaxAllowErrors] = useState(3);
-
-    // const [skipCounter, setSkipCounter] = useState(0);
-    // const [maxSkips, setMaxSkips] = useState(3);
-
-    // const [isGameOver, setIsGameOver] = useState(false);
+        confetii({
+            particleCount: 100,
+            spread: 120,
+            origin: { y: 0.6 },
+        });
+    }, [points]);
 
     const handleGuessSubmit = (e: React.FormEvent) => {
         // Previene el refresh de la página
         e.preventDefault();
-        // Implementar lógica de juego
-        console.log('Intento de adivinanza:', guess, currentWord);
 
-        // if (guess === currentWord.trim()) {
-        //     const newWords = words.slice(1);
-
-        //     confetii({
-        //         particleCount: 100,
-        //         spread: 120,
-        //         origin: { y: 0.6 },
-        //     });
-
-        //     setPoints((prev) => prev + 1);
-        //     setGuess('');
-        //     setWords(newWords);
-        //     setCurrentWord(newWords[0]);
-        //     setScrambledWord(scrambleWord(newWords[0]));
-        //     return;
-        // }
-
-        // setErrorCounter((err) => err + 1);
-
-        // if (errorCounter + 1 >= maxAllowErrors) {
-        //     setIsGameOver(true);
-        // }
+        dispatch({
+            type: 'CHECK_ANSWER',
+        });
     };
 
     const handleSkip = () => {
-        // if (skipCounter == maxSkips) return;
-        // const updateWords = words.slice(1);
-        // setSkipCounter((skip) => skip + 1);
-        // setWords(updateWords);
-        // setCurrentWord(updateWords[0]);
-        // setScrambledWord(scrambleWord(updateWords[0]));
-        // setGuess('');
+        dispatch({ type: 'SKIP_WORD' });
     };
 
     const handlePlayAgain = () => {
-        // const newArrayWords = shuffleArray(GAME_WORDS);
-        // setGuess('');
-        // setIsGameOver(false);
-        // setErrorCounter(0);
-        // setPoints(0);
-        // setSkipCounter(0);
-        // setCurrentWord(newArrayWords[0]);
-        // setWords(newArrayWords);
-        // setScrambledWord(scrambleWord(newArrayWords[0]));
+        dispatch({
+            type: 'START_NEW_GAME',
+            payload: getInitialState(),
+        });
     };
 
     //! Si ya no hay palabras para jugar, se muestra el mensaje de fin de juego
     if (words.length === 0) {
+        confetii({
+            particleCount: 100,
+            spread: 120,
+            origin: { y: 0.6 },
+        });
+
         return (
             <div className="min-h-screen bg-gradient-to-br from-purple-100 via-blue-50 to-indigo-100 flex items-center justify-center p-4">
                 <div className="w-full max-w-md mx-auto">
@@ -163,8 +134,10 @@ export const ScrambleWords = () => {
                                         type="text"
                                         value={guess}
                                         onChange={(e) =>
-                                            //setGuess(e.target.value.toUpperCase().trim()
-                                            console.log(e.target.value)
+                                            dispatch({
+                                                type: 'SET_GUESS',
+                                                payload: e.target.value,
+                                            })
                                         }
                                         placeholder="Ingresa tu palabra..."
                                         className="text-center text-lg font-semibold h-12 border-2 border-indigo-200 focus:border-indigo-500 transition-colors"

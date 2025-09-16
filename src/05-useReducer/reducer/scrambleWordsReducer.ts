@@ -67,14 +67,62 @@ export const getInitialState = (): ScrambleWordState => {
 }
 
 export type ScrambleWordsActions = 
-{ type: 'NO_TENGO_NI_IDEA_DE_QUE_ACCION'}
-| { type: 'NO_TENGO_NI_IDEA_DE_QUE_ACCION2'}
-| { type: 'NO_TENGO_NI_IDEA_DE_QUE_ACCION3'};
+{ type: 'SET_GUESS', payload: string}
+| { type: 'CHECK_ANSWER'}
+| { type: 'START_NEW_GAME', payload: ScrambleWordState}
+| { type: 'SKIP_WORD'};
 
-export const scrambleWordsReducer = (state: ScrambleWordState, action: ScrambleWordsActions) => {
+export const scrambleWordsReducer = (state: ScrambleWordState, action: ScrambleWordsActions): ScrambleWordState => {
 
     switch(action.type){
 
+        case 'SET_GUESS':{
+            return {
+                ...state,
+                guess: action.payload.trim().toUpperCase()
+            }
+
+        }
+
+        case 'CHECK_ANSWER':{
+            const newWords = state.words.slice(1);
+
+            if(state.guess === state.currentWord){
+                return {
+                    ...state,
+                    points: state.points + 1,
+                    guess: '',
+                    words: newWords,
+                    currentWord: newWords[0],
+                    scrambledWord: scrambleWord(newWords[0])
+                }
+            }
+
+            return {
+                ...state,
+                guess: '',
+                errorCounter: state.errorCounter + 1,
+                isGameOver: state.errorCounter + 1 >= state.maxAllowErrors
+            }
+        }
+
+        case 'SKIP_WORD': {
+            if(state.skipCounter >= state.maxSkips) return state;
+                
+            const updateWords = state.words.slice(1); 
+
+            return {
+                ...state,
+                skipCounter: state.skipCounter + 1,
+                words: updateWords,
+                currentWord: updateWords[0],
+                scrambledWord: scrambleWord(updateWords[0]),
+                guess: ''
+            }
+        }
+
+        case 'START_NEW_GAME': 
+            return action.payload;
 
         default:
             return state;
