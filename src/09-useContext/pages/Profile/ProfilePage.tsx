@@ -1,3 +1,26 @@
+import { UserContext } from '@/09-useContext/context/UserContext';
+import { Button } from '@/components/ui/button';
+import { useContext } from 'react';
+
 export const ProfilePage = () => {
-    return <div>ProfilePage</div>;
+    const { user, logout } = useContext(UserContext);
+    // const navigation = useNavigate();
+
+    // const handleLogout = () => {
+    //     logout();
+    //     navigation('/login');
+    // };
+
+    return (
+        <div className="flex flex-col items-center justify-center min-h-screen">
+            <h1 className="text-2xl font-bold">Perfil del usaurio</h1>
+            <hr />
+
+            <pre className="my-4 w-[%80] overflow-x-auto">{JSON.stringify({ user }, null, 2)}</pre>
+
+            <Button variant="destructive" onClick={logout}>
+                Salir
+            </Button>
+        </div>
+    );
 };
